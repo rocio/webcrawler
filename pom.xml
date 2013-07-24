@@ -1,0 +1,14 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.example.webcrawler</groupId>
+  <artifactId>webcrawler</artifactId>
+  <version>1</version>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk</artifactId>
+      <version>1.5.1</version>
+    </dependency>
+  </dependencies>
+</project>
