@@ -10,5 +10,10 @@
       <artifactId>aws-java-sdk</artifactId>
       <version>1.4.5</version>
     </dependency>
+      <dependency>
+          <groupId>org.jsoup</groupId>
+          <artifactId>jsoup</artifactId>
+          <version>1.7.2</version>
+      </dependency>
   </dependencies>
 </project>
