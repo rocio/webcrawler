@@ -14,4 +14,6 @@ public interface QueueService {
 
   	QueueMessageResponse produce(String message);
 
+	List<QueueMessageResponse> produce(List<String> messages);
+
 }

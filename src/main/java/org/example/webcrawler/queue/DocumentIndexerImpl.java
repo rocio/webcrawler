@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrServer;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.example.webcrawler.queue.model.CrawledDocument;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
@@ -67,7 +68,7 @@ public class DocumentIndexerImpl implements DocumentIndexer {
 
 	@Override
 	public void indexDocument(CrawledDocument crawledDocument) {
-
+		if (crawledDocument == null) return;
 		try {
 			UpdateResponse updateResponse = solrServer.addBean(crawledDocument);
 			logger.info(updateResponse.getResponse());

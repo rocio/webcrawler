@@ -8,10 +8,12 @@ import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.amazonaws.services.sqs.model.SendMessageResult;
+import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.example.webcrawler.queue.model.QueueMessageResponse;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,7 +41,7 @@ public class QueueServiceImpl implements QueueService {
 			//return deleteMessage(message);
 		}
 
-		return null;
+		return Collections.EMPTY_LIST;
 	}
 
 	@Override
@@ -58,6 +60,15 @@ public class QueueServiceImpl implements QueueService {
 		}
 
 		return new QueueMessageResponse("FAIL");
+	}
+
+	@Override
+	public List<QueueMessageResponse> produce(List<String> messages) {
+		List<QueueMessageResponse> response = Lists.newArrayListWithExpectedSize(messages.size());
+		for (String message: messages) {
+			response.add(produce(message));
+		}
+		return Collections.EMPTY_LIST;
 	}
 
 	private Message deleteMessage(Message message) {

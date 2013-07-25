@@ -1,15 +1,13 @@
 package org.example.webcrawler;
 
-import com.amazonaws.auth.AnonymousAWSCredentials;
-import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
-import org.apache.commons.collections.CollectionUtils;
 import org.example.webcrawler.queue.DocumentIndexer;
 import org.example.webcrawler.queue.DocumentIndexerImpl;
+import org.example.webcrawler.queue.QueueService;
 import org.example.webcrawler.queue.QueueServiceImpl;
 import org.example.webcrawler.queue.model.CrawledDocument;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,24 +18,21 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class CrawlerMain {
-    public static void main(String[] argv) {
+	public static void main(String[] argv) {
 
-		QueueServiceImpl queueService = new QueueServiceImpl();
+		QueueService queueService = new QueueServiceImpl();
 		DocumentIndexer documentIndexer = new DocumentIndexerImpl();
 
 		List<Message> messages = queueService.consume();
-		if (CollectionUtils.isNotEmpty(messages)) {
-			for(Message message: messages) {
-				System.out.println("[messageId]" + message.getMessageId());
-				CrawledDocument document = documentIndexer.fetchDocument(message);
+
+		for(Message message: messages) {
+			System.out.println("[messageId]" + message.getMessageId());
+
+			CrawledDocument document = documentIndexer.fetchDocument(message);
+			if (document != null) {
 				documentIndexer.indexDocument(document);
-				if(CollectionUtils.isNotEmpty(document.getChildUrl())) {
-					for (String url: document.getChildUrl()) {
-						System.out.println(url);
-						queueService.produce(url);
-					}
-				}
+				queueService.produce(document.getChildUrl());
 			}
 		}
-    }
+	}
 }
