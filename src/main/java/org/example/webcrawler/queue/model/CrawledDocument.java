@@ -1,5 +1,7 @@
 package org.example.webcrawler.queue.model;
 
+import org.apache.solr.client.solrj.beans.Field;
+
 import java.util.List;
 
 /**
@@ -16,6 +18,7 @@ public class CrawledDocument {
 		return id;
 	}
 
+	@Field
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -24,6 +27,7 @@ public class CrawledDocument {
 		return messageId;
 	}
 
+	@Field
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
@@ -32,6 +36,7 @@ public class CrawledDocument {
 		return messageBody;
 	}
 
+	@Field
 	public void setMessageBody(String messageBody) {
 		this.messageBody = messageBody;
 	}
@@ -40,6 +45,7 @@ public class CrawledDocument {
 		return childUrl;
 	}
 
+	@Field
 	public void setChildUrl(List<String> childUrl) {
 		this.childUrl = childUrl;
 	}

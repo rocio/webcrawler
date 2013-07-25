@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface QueueService {
 
-	Message consume();
+	List<Message> consume();
 
   	QueueMessageResponse produce(String message);
 

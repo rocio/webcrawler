@@ -2,6 +2,7 @@ package org.example.webcrawler.queue;
 
 import com.amazonaws.auth.AnonymousAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQSClient;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
@@ -11,26 +12,32 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.example.webcrawler.queue.model.QueueMessageResponse;
 
+import java.util.List;
+
 /**
  * author: rocio
  */
 public class QueueServiceImpl implements QueueService {
 
-	private static final String QUEUE_URL= "https://sqs.us-east-1.amazonaws.com/031396681695/julian-testHtmlCrawlingQueue";
+	public static final String QUEUE_URL= "https://sqs.us-east-1.amazonaws.com/031396681695/julian-testHtmlCrawlingQueue";
+
+	private AmazonSQSClient sqsClient;
+
+	public QueueServiceImpl() {
+		sqsClient = new AmazonSQSClient(new AnonymousAWSCredentials());
+	}
 
 	@Override
-	public Message consume() {
-		AmazonSQSClient sqsClient = new AmazonSQSClient(new AnonymousAWSCredentials());
+	public List<Message> consume() {
 		ReceiveMessageRequest messageRequest = new ReceiveMessageRequest()
 				.withQueueUrl(QUEUE_URL)
-				.withMaxNumberOfMessages(1);
+				.withMaxNumberOfMessages(10);
 
 		ReceiveMessageResult messageResult = sqsClient.receiveMessage(messageRequest);
 		if (messageResult != null && CollectionUtils.isNotEmpty(messageResult.getMessages())) {
-			Message message = messageResult.getMessages().get(0);
-			return message;
+			return messageResult.getMessages();
+			//return deleteMessage(message);
 		}
-
 
 		return null;
 	}
@@ -42,7 +49,6 @@ public class QueueServiceImpl implements QueueService {
 					.withQueueUrl(QUEUE_URL)
 					.withMessageBody(message);
 
-			AmazonSQSClient sqsClient = new AmazonSQSClient(new AnonymousAWSCredentials());
 			SendMessageResult messageResult = sqsClient.sendMessage(messageRequest);
 			if (messageRequest != null) {
 				QueueMessageResponse queueMessageResponse = new QueueMessageResponse();
@@ -52,5 +58,10 @@ public class QueueServiceImpl implements QueueService {
 		}
 
 		return new QueueMessageResponse("FAIL");
+	}
+
+	private Message deleteMessage(Message message) {
+		sqsClient.deleteMessage(new DeleteMessageRequest().withQueueUrl(QUEUE_URL).withReceiptHandle(message.getReceiptHandle()));
+		return message;
 	}
 }

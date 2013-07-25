@@ -1,7 +1,16 @@
 package org.example.webcrawler;
 
+import com.amazonaws.auth.AnonymousAWSCredentials;
+import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import org.apache.commons.collections.CollectionUtils;
+import org.example.webcrawler.queue.DocumentIndexer;
+import org.example.webcrawler.queue.DocumentIndexerImpl;
 import org.example.webcrawler.queue.QueueServiceImpl;
+import org.example.webcrawler.queue.model.CrawledDocument;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,11 +23,21 @@ public class CrawlerMain {
     public static void main(String[] argv) {
 
 		QueueServiceImpl queueService = new QueueServiceImpl();
-		queueService.produce("Some message");
+		DocumentIndexer documentIndexer = new DocumentIndexerImpl();
 
-		Message message = queueService.consume();
-		if (message != null) {
-        	System.out.println("[messageId]" + message.getMessageId());
+		List<Message> messages = queueService.consume();
+		if (CollectionUtils.isNotEmpty(messages)) {
+			for(Message message: messages) {
+				System.out.println("[messageId]" + message.getMessageId());
+				CrawledDocument document = documentIndexer.fetchDocument(message);
+				documentIndexer.indexDocument(document);
+				if(CollectionUtils.isNotEmpty(document.getChildUrl())) {
+					for (String url: document.getChildUrl()) {
+						System.out.println(url);
+						queueService.produce(url);
+					}
+				}
+			}
 		}
     }
 }
