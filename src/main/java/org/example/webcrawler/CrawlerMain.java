@@ -1,5 +1,8 @@
 package org.example.webcrawler;
 
+import com.amazonaws.services.sqs.model.Message;
+import org.example.webcrawler.queue.QueueServiceImpl;
+
 /**
  * Created with IntelliJ IDEA.
  * User: jgraham
@@ -9,6 +12,13 @@ package org.example.webcrawler;
  */
 public class CrawlerMain {
     public static void main(String[] argv) {
-        System.out.println("Hello, world!");
+
+		QueueServiceImpl queueService = new QueueServiceImpl();
+		queueService.produce("Some message");
+
+		Message message = queueService.consume();
+		if (message != null) {
+        	System.out.println("[messageId]" + message.getMessageId());
+		}
     }
 }
